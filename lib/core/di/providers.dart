@@ -48,6 +48,7 @@ import '../../application/playlist/list_playlist_user_usecase.dart';
 import '../../application/playlist/list_song_in_playlist_usecase.dart';
 import '../../application/playlist/create_playlist_usecase.dart';
 import '../../application/playlist/add_song_to_playlist_usecase.dart';
+import '../../application/playlist/remove_song_from_playlist_usecase.dart';
 
 // FAVORITES
 import '../../application/favorites/list_favorites_usecase.dart';
@@ -61,6 +62,10 @@ import '../../presentation/controllers/auth_controller.dart';
 import '../../presentation/controllers/songs_controller.dart';
 import '../../presentation/controllers/playlist_controller.dart';
 import '../../presentation/controllers/favorite_controller.dart';
+
+// profile
+import '../../application/auth/update_profile_usecase.dart';
+import '../../infrastructure/repository_impl/user_repository_impl.dart';
 
 //
 // =============================================================
@@ -146,7 +151,7 @@ final songsControllerProvider =
     ref.watch(fetchAllSongsUsecaseProvider),
     ref.watch(uploadSongUsecaseProvider),
     ref.watch(searchSongsUsecaseProvider),
-    SearchLocalDatasource(),              // ADD
+    SearchLocalDatasource(), // ADD
     ref: ref,
   );
 });
@@ -155,6 +160,14 @@ final searchSongsUsecaseProvider = Provider(
   (ref) => SearchSongsUsecase(ref.watch(songRepositoryProvider)),
 );
 
+final removeSongUsecaseProvider = Provider(
+  (ref) => RemoveSongFromPlaylistUsecase(ref.watch(playlistRepositoryProvider)),
+);
+
+// Profile
+final userRepositoryProvider = Provider((ref) => UserRepositoryImpl());
+final updateProfileUsecaseProvider =
+    Provider((ref) => UpdateProfileUsecase(ref.watch(userRepositoryProvider)));
 
 // PLAYLIST CONTROLLER
 final playlistControllerProvider =
@@ -164,13 +177,15 @@ final playlistControllerProvider =
     createPlaylist: ref.watch(createPlaylistUsecaseProvider),
     addSongToPlaylist: ref.watch(addSongToPlaylistUsecaseProvider),
     listSongsInPlaylist: ref.watch(listSongsInPlaylistUsecaseProvider),
+    removeSongUsecase: ref.watch(removeSongUsecaseProvider), // ← FIXED
     ref: ref,
   );
-});
+}); 
 
 // FAVORITE CONTROLLER
 final favoriteControllerProvider =
-    StateNotifierProvider<FavoriteController, AsyncValue<List<FavoriteEntity>>>((ref) {
+    StateNotifierProvider<FavoriteController, AsyncValue<List<FavoriteEntity>>>(
+        (ref) {
   return FavoriteController(
     listFavorites: ref.watch(listFavoritesUsecaseProvider),
     markFavorite: ref.watch(markFavoriteUsecaseProvider),
@@ -178,7 +193,7 @@ final favoriteControllerProvider =
 });
 
 // PLAYLIST SONGS CONTROLLER (untuk detail playlist)
-final playlistControllerProviderSongs =
-    StateNotifierProvider<PlaylistSongsController, AsyncValue<List<SongEntity>>>((ref) {
+final playlistControllerProviderSongs = StateNotifierProvider<
+    PlaylistSongsController, AsyncValue<List<SongEntity>>>((ref) {
   return PlaylistSongsController();
 });

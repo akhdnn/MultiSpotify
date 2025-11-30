@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../core/di/providers.dart';
+
+// Widgets
 import '../../widgets/song/song_card.dart';
 import '../../widgets/playlist/playlist_card.dart';
+import '../../widgets/playlist/playlist_shimmer.dart';
 import '../../widgets/player/mini_player.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -17,14 +21,31 @@ class _HomePageState extends ConsumerState<HomePage> {
   double headerOpacity = 1.0;
 
   @override
+  void initState() {
+    super.initState();
+
+    Future.microtask(() async {
+      final user = ref.read(authControllerProvider);
+      if (user != null) {
+        await ref
+            .read(playlistControllerProvider.notifier)
+            .loadPlaylists(user.id);
+
+        await ref
+            .read(playlistControllerProvider.notifier)
+            .loadPlaylistCovers(user.id);
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final songs = ref.watch(songsControllerProvider);
     final playlists = ref.watch(playlistControllerProvider);
     final user = ref.watch(authControllerProvider);
 
-    final initial = (user?.email.isNotEmpty ?? false)
-        ? user!.email[0].toUpperCase()
-        : "?";
+    final initial =
+        (user?.email.isNotEmpty ?? false) ? user!.email[0].toUpperCase() : "?";
 
     return Scaffold(
       backgroundColor: const Color(0xFF0C0C0C),
@@ -41,7 +62,9 @@ class _HomePageState extends ConsumerState<HomePage> {
         child: SafeArea(
           child: CustomScrollView(
             slivers: [
-              // HEADER
+              // ============================================================
+              // HEADER PROFILE
+              // ============================================================
               SliverToBoxAdapter(
                 child: AnimatedOpacity(
                   duration: const Duration(milliseconds: 250),
@@ -51,7 +74,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // TEXT KIRI
+                        // TEXT
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -80,7 +103,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           onTapUp: (_) => setState(() => headerOpacity = 1.0),
                           onTap: () => _openProfileMenu(context, initial),
                           child: AnimatedScale(
-                            duration: const Duration(milliseconds: 150),
+                            duration: const Duration(milliseconds: 160),
                             scale: headerOpacity == 1 ? 1 : 0.9,
                             child: CircleAvatar(
                               radius: 22,
@@ -102,7 +125,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ),
               ),
 
-              // SEARCH BAR (TAP → /search)
+              // ============================================================
+              // SEARCH BAR (→ /search)
+              // ============================================================
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
@@ -138,14 +163,16 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ),
               ),
 
-              // PLAYLIST SECTION
+              // ============================================================
+              // PLAYLIST SECTION TITLE (INI BAGIAN YANG DITANYAKAN)
+              // ============================================================
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Text(
+                    children: [
+                      const Text(
                         "Playlist Kamu",
                         style: TextStyle(
                           color: Colors.white,
@@ -153,15 +180,21 @@ class _HomePageState extends ConsumerState<HomePage> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      Text(
-                        "Lihat semua",
-                        style: TextStyle(color: Colors.white54, fontSize: 14),
+                      TextButton(
+                        onPressed: () => context.push('/playlists'),
+                        child: const Text(
+                          "Kelola",
+                          style: TextStyle(color: Colors.white70),
+                        ),
                       ),
                     ],
                   ),
                 ),
               ),
 
+              // ============================================================
+              // PLAYLIST LIST (HORIZONTAL)
+              // ============================================================
               playlists.when(
                 data: (data) {
                   if (data.isEmpty) {
@@ -179,25 +212,35 @@ class _HomePageState extends ConsumerState<HomePage> {
 
                   return SliverToBoxAdapter(
                     child: SizedBox(
-                      height: 150,
+                      height: 170,
                       child: ListView.separated(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         scrollDirection: Axis.horizontal,
                         itemCount: data.length,
-                        separatorBuilder: (_, __) =>
-                            const SizedBox(width: 14),
+                        separatorBuilder: (_, __) => const SizedBox(width: 14),
                         itemBuilder: (context, i) {
-                          return PlaylistCard(playlist: data[i]);
+                          final coverUrl = ref
+                              .watch(playlistControllerProvider.notifier)
+                              .playlistCovers[data[i].id];
+
+                          return PlaylistCard(
+                            playlist: data[i],
+                            coverUrl: coverUrl,
+                          );
                         },
                       ),
                     ),
                   );
                 },
-                loading: () => const SliverToBoxAdapter(
-                  child: Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: CircularProgressIndicator(),
+                loading: () => SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 170,
+                    child: ListView.separated(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 4,
+                      separatorBuilder: (_, __) => const SizedBox(width: 14),
+                      itemBuilder: (_, __) => const PlaylistShimmer(),
                     ),
                   ),
                 ),
@@ -212,26 +255,26 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ),
               ),
 
-              // RECOMMENDED SONGS
+              // ============================================================
+              // RECOMMENDED HEADER
+              // ============================================================
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(20, 30, 20, 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Text(
-                        "Rekomendasi Untuk Kamu",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+                  child: const Text(
+                    "Rekomendasi Untuk Kamu",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
 
+              // ============================================================
+              // RECOMMENDED SONGS LIST
+              // ============================================================
               songs.when(
                 data: (list) {
                   if (list.isEmpty) {
@@ -282,12 +325,13 @@ class _HomePageState extends ConsumerState<HomePage> {
         ),
       ),
 
+      // MINI PLAYER
       bottomNavigationBar: const MiniPlayer(),
     );
   }
 
   // ============================================================
-  // BOTTOM SHEET ala Spotify
+  // PROFILE MENU (Bottom Sheet)
   // ============================================================
   void _openProfileMenu(BuildContext context, String initial) {
     showModalBottomSheet(
@@ -314,7 +358,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ),
               ),
               const SizedBox(height: 20),
-
               ListTile(
                 onTap: () => context.go('/profile'),
                 leading: CircleAvatar(
@@ -329,22 +372,16 @@ class _HomePageState extends ConsumerState<HomePage> {
                   style: TextStyle(color: Colors.white),
                 ),
               ),
-
               ListTile(
                 leading: const Icon(Icons.settings, color: Colors.white),
-                title: const Text(
-                  "Pengaturan",
-                  style: TextStyle(color: Colors.white),
-                ),
+                title: const Text("Pengaturan",
+                    style: TextStyle(color: Colors.white)),
                 onTap: () {},
               ),
-
               ListTile(
                 leading: const Icon(Icons.logout, color: Colors.redAccent),
-                title: const Text(
-                  "Logout",
-                  style: TextStyle(color: Colors.redAccent),
-                ),
+                title: const Text("Logout",
+                    style: TextStyle(color: Colors.redAccent)),
                 onTap: () async {
                   await ref.read(authControllerProvider.notifier).logout();
                   Navigator.pop(context);

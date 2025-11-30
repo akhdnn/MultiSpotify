@@ -14,6 +14,8 @@ dependencies:
   # STATE MANAGEMENT
   flutter_riverpod: ^2.5.1
 
+  collection: ^1.17.2
+
   # ROUTING
   go_router: ^14.2.3
 
@@ -31,6 +33,7 @@ dependencies:
 
   # (Optional) If still want flutter_bloc, you can keep it:
   flutter_bloc: ^9.1.1
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:

@@ -11,4 +11,9 @@ abstract class PlaylistRepository {
 
   Future<void> addSong(String playlistId, String songId);
   Future<void> removeSong(String playlistId, String songId);
+
+  Future<void> duplicatePlaylist(String playlistId);
+
+  // Batch 7 — ambil cover lagu pertama
+  Future<String?> fetchFirstSongCover(String playlistId);
 }

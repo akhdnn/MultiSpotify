@@ -1,22 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-
 import '../../../core/di/providers.dart';
+import 'playlist_preview_list.dart';
+import 'playlist_preview_shimmer.dart';
+import 'profile_edit_modal.dart';
 
-// Widgets
-import '../../widgets/profile/profile_edit_modal.dart';
-import '../../widgets/profile/playlist_preview_list.dart';
-import '../../widgets/profile/playlist_preview_shimmer.dart';
-
-class ProfilePage extends ConsumerStatefulWidget {
-  const ProfilePage({super.key});
+class ProfilePanel extends ConsumerStatefulWidget {
+  const ProfilePanel({super.key});
 
   @override
-  ConsumerState<ProfilePage> createState() => _ProfilePageState();
+  ConsumerState<ProfilePanel> createState() => _ProfilePanelState();
 }
 
-class _ProfilePageState extends ConsumerState<ProfilePage> {
+class _ProfilePanelState extends ConsumerState<ProfilePanel> {
   double avatarOffset = 0;
 
   @override
@@ -35,8 +31,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final playlists = ref.watch(playlistControllerProvider);
     final user = ref.watch(authControllerProvider);
+    final playlists = ref.watch(playlistControllerProvider);
 
     final initial = (user?.email.isNotEmpty ?? false)
         ? user!.email[0].toUpperCase()
@@ -44,38 +40,39 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
     return NotificationListener<ScrollUpdateNotification>(
       onNotification: (scroll) {
-        setState(() {
-          avatarOffset = (scroll.metrics.pixels * 0.25).clamp(0, 40);
-        });
+        avatarOffset = (scroll.metrics.pixels * 0.20).clamp(0, 36);
+        setState(() {});
         return false;
       },
-      child: Scaffold(
-        backgroundColor: const Color(0xFF0C0C0C),
-        body: CustomScrollView(
+      child: Container(
+        height: MediaQuery.of(context).size.height * 0.92,
+        decoration: const BoxDecoration(
+          color: Color(0xFF0C0C0C),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: CustomScrollView(
           slivers: [
             SliverAppBar(
-              expandedHeight: 250,
               pinned: true,
-              backgroundColor: Colors.black,
+              expandedHeight: 230,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
               flexibleSpace: FlexibleSpaceBar(
                 background: Stack(
                   alignment: Alignment.center,
                   children: [
-                    // BACKGROUND GRADIENT
+                    // GRADIENT
                     Container(
                       decoration: const BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [
-                            Color(0xFF202020),
-                            Color(0xFF0C0C0C),
-                          ],
+                          colors: [Color(0xFF262626), Color(0xFF0C0C0C)],
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                         ),
                       ),
                     ),
 
-                    // AVATAR PARALLAX + HERO
+                    // PARALLAX AVATAR
                     Transform.translate(
                       offset: Offset(0, avatarOffset),
                       child: Hero(
@@ -86,10 +83,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           child: Text(
                             initial,
                             style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 46,
-                              fontWeight: FontWeight.bold,
-                            ),
+                                color: Colors.white,
+                                fontSize: 46,
+                                fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -99,24 +95,26 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ),
             ),
 
+            // BODY
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(22),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // EMAIL
                     Text(
-                      user?.email ?? "",
+                      user?.email ?? "(no email)",
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
+
                     const SizedBox(height: 20),
 
-                    // EDIT PROFILE Button → Bottom Sheet
+                    // EDIT PROFILE BTN
                     ElevatedButton(
                       onPressed: () => showModalBottomSheet(
                         context: context,
@@ -129,7 +127,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
                     const SizedBox(height: 30),
 
-                    // PLAYLIST SECTION TITLE
+                    // PLAYLIST SECTION
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -142,74 +140,63 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           ),
                         ),
                         TextButton(
-                          onPressed: () => context.push('/playlists'),
+                          onPressed: () => Navigator.pop(context),
                           child: const Text(
-                            "Lihat Semua",
+                            "Kelola",
                             style: TextStyle(color: Colors.white70),
                           ),
                         )
                       ],
                     ),
-                    const SizedBox(height: 10),
 
-                    // PLAYLIST COUNTER
+                    // Counter
                     playlists.maybeWhen(
-                      data: (list) {
-                        return Text(
-                          "${list.length} Playlist",
-                          style: const TextStyle(
-                            color: Colors.white54,
-                            fontSize: 14,
-                          ),
-                        );
-                      },
+                      data: (list) => Text(
+                        "${list.length} Playlist",
+                        style: const TextStyle(
+                          color: Colors.white54,
+                          fontSize: 14,
+                        ),
+                      ),
                       orElse: () => const SizedBox(),
                     ),
+                    const SizedBox(height: 16),
 
-                    const SizedBox(height: 20),
-
-                    // PLAYLIST PREVIEW LIST
+                    // PLAYLIST PREVIEW
                     playlists.when(
-                      data: (list) => list.isEmpty
-                          ? const Text(
-                              "Belum ada playlist. Buat playlist pertama kamu!",
-                              style: TextStyle(color: Colors.white54),
-                            )
-                          : PlaylistPreviewList(playlists: list),
                       loading: () => const PlaylistPreviewShimmer(),
                       error: (e, s) => Text(
                         "Error: $e",
                         style: const TextStyle(color: Colors.redAccent),
                       ),
+                      data: (list) => list.isEmpty
+                          ? const Text(
+                              "Belum ada playlist.",
+                              style: TextStyle(color: Colors.white54),
+                            )
+                          : PlaylistPreviewList(playlists: list),
                     ),
 
-                    const SizedBox(height: 50),
+                    const SizedBox(height: 30),
 
                     // LOGOUT
                     ElevatedButton(
                       onPressed: () async {
                         await ref.read(authControllerProvider.notifier).logout();
-                        context.go('/login');
+                        Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.redAccent,
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
                       ),
-                      child: const Center(
-                        child: Text(
-                          "Logout",
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ),
+                      child: const Text("Logout"),
                     ),
 
                     const SizedBox(height: 40),
                   ],
                 ),
               ),
-            ),
+            )
           ],
         ),
       ),
