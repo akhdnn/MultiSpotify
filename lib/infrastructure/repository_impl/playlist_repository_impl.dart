@@ -46,8 +46,6 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
         .eq('user_id', userId)
         .order('created_at', ascending: false);
 
-    if (response == null || response is! List) return [];
-
     return response
         .map((row) => PlaylistDto.fromJson(row))
         .map(
@@ -68,8 +66,6 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
         .select('song_id, songs(*)')
         .eq('playlist_id', playlistId)
         .order('created_at', ascending: false);
-
-    if (res == null || res is! List) return [];
 
     return res
         .map((item) => item['songs'])
@@ -112,7 +108,7 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
         .eq('playlist_id', playlistId)
         .limit(1);
 
-    if (res == null || res.isEmpty) return null;
+    if (res.isEmpty) return null;
 
     return res.first['songs']?['cover_url'];
   }

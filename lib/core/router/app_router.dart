@@ -7,7 +7,7 @@ import '../../presentation/pages/auth/login_page.dart';
 import '../../presentation/pages/auth/register_page.dart';
 import '../../presentation/pages/home/home_page.dart';
 import '../../presentation/pages/profile/profile_page.dart';
-import '../../presentation/pages/search/search_page.dart'; // ADD
+import '../../presentation/pages/search/search_page.dart';
 import '../../domain/entities/song_entity.dart';
 
 import '../../presentation/pages/songs/all_songs_page.dart';
@@ -15,7 +15,6 @@ import '../../presentation/pages/songs/song_detail_page.dart';
 import '../../presentation/pages/playlist/playlist_list_page.dart';
 import '../../presentation/pages/playlist/playlist_detail_page.dart';
 import '../../presentation/pages/admin/add_song_page.dart';
-import '../../presentation/pages/playlist/playlist_editor_page.dart';
 import '../../presentation/widgets/player/full_player_page.dart';
 import '../../presentation/pages/playlist/playlist_create_page.dart';
 import '../../presentation/pages/playlist/playlist_edit_page.dart';
@@ -37,10 +36,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         return null;
       }
 
-      if (user != null) {
-        if (loggingIn || registering) return '/';
-      }
-
+      if (loggingIn || registering) return '/';
+    
       return null;
     },
     routes: [

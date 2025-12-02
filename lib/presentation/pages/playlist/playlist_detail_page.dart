@@ -33,12 +33,12 @@ class _PlaylistDetailPageState extends ConsumerState<PlaylistDetailPage> {
       final user = ref.read(authControllerProvider);
       if (user == null) return;
 
-      // load songs of this playlist
+      // load lagu playlist
       await ref
           .read(playlistControllerProvider.notifier)
           .loadSongsInPlaylist(widget.playlistId);
 
-      // reload playlist info
+      // load info playlist
       await ref
           .read(playlistControllerProvider.notifier)
           .loadPlaylists(user.id);
@@ -93,9 +93,7 @@ class _PlaylistDetailPageState extends ConsumerState<PlaylistDetailPage> {
     );
   }
 
-  // =============================================================
-  // HEADER aman 100% (AsyncValue)
-  // =============================================================
+  // header
   SliverAppBar _buildHeader(
     BuildContext context,
     playlist,
@@ -136,7 +134,7 @@ class _PlaylistDetailPageState extends ConsumerState<PlaylistDetailPage> {
     return Stack(
       fit: StackFit.expand,
       children: [
-        // COVER
+        // cover
         if (coverUrl != null)
           Image.network(
             coverUrl,
@@ -154,7 +152,7 @@ class _PlaylistDetailPageState extends ConsumerState<PlaylistDetailPage> {
             ),
           ),
 
-        // GRADIENT
+        // gradien
         Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -170,7 +168,7 @@ class _PlaylistDetailPageState extends ConsumerState<PlaylistDetailPage> {
           ),
         ),
 
-        // INFO TEXT
+        // text info
         Padding(
           padding: const EdgeInsets.fromLTRB(24, 100, 24, 24),
           child: Column(
@@ -203,9 +201,7 @@ class _PlaylistDetailPageState extends ConsumerState<PlaylistDetailPage> {
     );
   }
 
-  // =============================================================
-  // SONG LIST aman 100%
-  // =============================================================
+  // list lagu
   Widget _buildSongList(AsyncValue<List<dynamic>> playlistSongs) {
     return playlistSongs.when(
       loading: () => const SliverToBoxAdapter(
@@ -259,9 +255,7 @@ class _PlaylistDetailPageState extends ConsumerState<PlaylistDetailPage> {
     );
   }
 
-  // =============================================================
-  // Add Song
-  // =============================================================
+  // tambah lagu
   void _openAddSong(String userId) {
     showModalBottomSheet(
       context: context,
@@ -277,9 +271,7 @@ class _PlaylistDetailPageState extends ConsumerState<PlaylistDetailPage> {
     );
   }
 
-  // =============================================================
-  // Remove Song
-  // =============================================================
+  // hapus lagu
   void _removeSong(String songId) async {
     final user = ref.read(authControllerProvider);
     if (user == null) return;
@@ -316,9 +308,7 @@ class _PlaylistDetailPageState extends ConsumerState<PlaylistDetailPage> {
     );
   }
 
-  // =============================================================
-  // MENU (Edit / Duplicate / Delete)
-  // =============================================================
+  // menu
   void _openMenu(playlist, String userId) {
     showModalBottomSheet(
       context: context,

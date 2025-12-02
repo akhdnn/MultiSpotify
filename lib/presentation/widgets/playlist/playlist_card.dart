@@ -180,7 +180,7 @@ class PlaylistCard extends ConsumerWidget {
               Navigator.pop(context);
               await ref
                   .read(playlistControllerProvider.notifier)
-                  .delete(playlist.id, user!.id);
+                  .delete(playlist.id, user.id);
             },
             child: const Text("Hapus"),
           ),

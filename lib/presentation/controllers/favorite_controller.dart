@@ -27,7 +27,7 @@ class FavoriteController extends StateNotifier<AsyncValue<List<FavoriteEntity>>>
     try {
       await markFavorite.execute(songId);
 
-      // after marking favorite, refresh list
+      // refresh list after masukin favorites
       final favorites = await listFavorites.execute();
       state = AsyncValue.data(favorites);
     } catch (e) {

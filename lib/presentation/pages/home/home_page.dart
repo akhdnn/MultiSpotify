@@ -3,9 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/di/providers.dart';
-import '../../controllers/songs_controller.dart';
 
-// Widgets
+// widgets
 import '../../widgets/song/song_card.dart';
 import '../../widgets/playlist/playlist_card.dart';
 import '../../widgets/playlist/playlist_shimmer.dart';
@@ -28,7 +27,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     Future.microtask(() async {
       final user = ref.read(authControllerProvider);
 
-      // Load playlist
+      // load playlist
       if (user != null) {
         await ref
             .read(playlistControllerProvider.notifier)
@@ -39,10 +38,10 @@ class _HomePageState extends ConsumerState<HomePage> {
             .loadPlaylistCovers(user.id);
       }
 
-      // Load songs global
+      // load semua lagu
       await ref.read(songsControllerProvider.notifier).loadAllSongs();
 
-      // Load songs milik user
+      // load lagu milik user
       if (user != null) {
         await ref
             .read(songsControllerProvider.notifier)
@@ -82,21 +81,15 @@ class _HomePageState extends ConsumerState<HomePage> {
               _buildHeader(initial),
               _buildSearchBar(),
 
-              // ----------------------------------------------------------
-              // PLAYLIST SECTION
-              // ----------------------------------------------------------
+              //playlist
               _playlistTitle(),
               _playlistList(playlists),
 
-              // ----------------------------------------------------------
-              // LAGU TERBARU (GLOBAL)
-              // ----------------------------------------------------------
+              // lagu terbaru
               _sectionTitle("Lagu Terbaru"),
               _latestSongs(songsAsync, allSongs),
 
-              // ----------------------------------------------------------
-              // LAGU YANG SAYA UPLOAD
-              // ----------------------------------------------------------
+              // lagu saya
               _sectionTitle("Lagu yang Saya Upload"),
               _mySongsList(mySongs),
 
@@ -110,9 +103,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  // ----------------------------------------------------------
-  // HEADER PROFILE
-  // ----------------------------------------------------------
+  // header
   SliverToBoxAdapter _buildHeader(String initial) {
     return SliverToBoxAdapter(
       child: AnimatedOpacity(

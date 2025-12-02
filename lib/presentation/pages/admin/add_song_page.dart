@@ -5,7 +5,6 @@ import 'package:file_picker/file_picker.dart';
 
 import '../../../core/di/providers.dart';
 import '../../../domain/entities/song_entity.dart';
-import '../../controllers/songs_controller.dart';
 import '../../../infrastructure/supabase/supabase_upload_service.dart';
 import '../../widgets/navbar_bottom.dart';
 
@@ -45,7 +44,7 @@ class _AddSongPageState extends ConsumerState<AddSongPage> {
   Widget build(BuildContext context) {
     final user = ref.watch(authControllerProvider);
 
-    // Only admin can upload songs
+    // perlu login dulu buat up lagu
     if (user == null) {
       return const Scaffold(
         body: Center(child: Text("Silakan login dulu.")),
@@ -122,7 +121,7 @@ class _AddSongPageState extends ConsumerState<AddSongPage> {
                           artist: artist.text.trim(),
                           coverUrl: coverUrl,
                           audioUrl: audioUrl,
-                          uploaderId: user!.id, // ★ FIX WAJIB DITAMBAHKAN
+                          uploaderId: user.id,
                         );
 
                         await ref

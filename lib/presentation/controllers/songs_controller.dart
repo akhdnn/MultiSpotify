@@ -15,16 +15,14 @@ class SongsController extends StateNotifier<AsyncValue<List<SongEntity>>> {
   final SearchLocalDatasource local;
   final Ref ref;
 
-  // ===========================================================
-  // NEW: TEMP STORAGE
-  // ===========================================================
+  // temporary storage lagu baru
   List<SongEntity> allSongs = [];
   List<SongEntity> mySongs = [];
 
   Timer? debounceTimer;
 
   List<String> recentSearch = [];
-  String searchCategory = "song"; // song / artist
+  String searchCategory = "song";
 
   SongsController(
     this.fetchSongs,
@@ -37,23 +35,17 @@ class SongsController extends StateNotifier<AsyncValue<List<SongEntity>>> {
     loadAllSongs();
   }
 
-  // ===========================================================
-  // LOAD RECENT SEARCH
-  // ===========================================================
+  // load recent search
   Future<void> loadRecent() async {
     recentSearch = await local.getRecent();
   }
 
-  // ===========================================================
-  // UPDATE SEARCH CATEGORY
-  // ===========================================================
+  // update search category
   void updateCategory(String cat) {
     searchCategory = cat;
   }
 
-  // ===========================================================
-  // DEBOUNCE SEARCH
-  // ===========================================================
+  // debounce
   Future<void> searchDebounce(String keyword) async {
     debounceTimer?.cancel();
     debounceTimer = Timer(const Duration(milliseconds: 300), () {
@@ -61,9 +53,7 @@ class SongsController extends StateNotifier<AsyncValue<List<SongEntity>>> {
     });
   }
 
-  // ===========================================================
-  // UPLOAD SONG
-  // ===========================================================
+  // upload lagu
   Future<void> uploadSong(SongEntity song) async {
     try {
       await uploadSongUsecase.execute(song);
@@ -76,19 +66,15 @@ class SongsController extends StateNotifier<AsyncValue<List<SongEntity>>> {
     }
   }
 
-  // ===========================================================
-  // LOAD ALL SONGS (GLOBAL)
-  // ===========================================================
+  // load semua lagu (global)
   Future<void> loadAllSongs() async {
     state = const AsyncValue.loading();
 
     try {
       final result = await fetchSongs.execute();
 
-      // SIMPAN ke variabel baru
       allSongs = result;
 
-      // Update state utama
       state = AsyncValue.data(allSongs);
 
     } catch (e, s) {
@@ -96,16 +82,14 @@ class SongsController extends StateNotifier<AsyncValue<List<SongEntity>>> {
     }
   }
 
-  // ===========================================================
-  // LOAD SONGS MILIK USER
-  // ===========================================================
+  // load songs punya user
   Future<void> loadMySongs(String userId) async {
     try {
       final data = await fetchSongs.execute();
 
       mySongs = data.where((s) => s.uploaderId == userId).toList();
 
-      // state tidak berubah → tetap allSongs untuk HomePage
+      // state tidak berubah = tetap allSongs untuk HomePage
       // kalau ingin state menjadi mySongs, panggil manual
 
     } catch (e, s) {
@@ -113,9 +97,7 @@ class SongsController extends StateNotifier<AsyncValue<List<SongEntity>>> {
     }
   }
 
-  // ===========================================================
-  // SEARCH SONGS + ARTISTS
-  // ===========================================================
+  // search lagu dan artists
   Future<void> search(String keyword) async {
     if (keyword.isEmpty) {
       state = AsyncValue.data([]);

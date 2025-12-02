@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/di/providers.dart';
 import '../../domain/entities/song_entity.dart';
-import '../controllers/playlist_controller.dart';
-import 'add_to_playlist_modal.dart';
-import 'create_playlist_modal.dart';
 // import 'favorite_button.dart';
 import 'package:go_router/go_router.dart';
 

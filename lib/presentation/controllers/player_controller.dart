@@ -3,7 +3,7 @@ import 'package:just_audio/just_audio.dart';
 
 import '../../domain/entities/song_entity.dart';
 
-/// STATE MODEL
+// state
 class PlayerStateModel {
   final SongEntity? currentSong;
   final bool isPlaying;
@@ -24,13 +24,13 @@ class PlayerStateModel {
   }
 }
 
-/// PROVIDER
+// provider
 final playerControllerProvider =
     StateNotifierProvider<PlayerController, PlayerStateModel>((ref) {
   return PlayerController();
 });
 
-/// CONTROLLER
+// controller
 class PlayerController extends StateNotifier<PlayerStateModel> {
   final AudioPlayer _audio = AudioPlayer();
 
@@ -42,9 +42,7 @@ class PlayerController extends StateNotifier<PlayerStateModel> {
     });
   }
 
-  // ===============================================================
-  // LOAD SONG + PLAY
-  // ===============================================================
+  // load lagu
   Future<void> playSong(SongEntity song) async {
     try {
       state = state.copyWith(currentSong: song);
@@ -58,9 +56,7 @@ class PlayerController extends StateNotifier<PlayerStateModel> {
     }
   }
 
-  // ===============================================================
-  // PAUSE / RESUME
-  // ===============================================================
+  // pause resume
   Future<void> togglePlay() async {
     if (_audio.playing) {
       await _audio.pause();
@@ -71,9 +67,7 @@ class PlayerController extends StateNotifier<PlayerStateModel> {
     }
   }
 
-  // ===============================================================
-  // STOP
-  // ===============================================================
+  // stop
   Future<void> stop() async {
     await _audio.stop();
     state = state.copyWith(isPlaying: false);

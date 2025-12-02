@@ -2,15 +2,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/playlist_entity.dart';
 import '../../domain/entities/song_entity.dart';
 
-// Usecases
 import '../../application/playlist/list_playlist_user_usecase.dart';
 import '../../application/playlist/list_song_in_playlist_usecase.dart';
 import '../../application/playlist/create_playlist_usecase.dart';
 import '../../application/playlist/add_song_to_playlist_usecase.dart';
 import '../../application/playlist/remove_song_from_playlist_usecase.dart';
-import '../../application/playlist/update_playlist_usecase.dart'; // <-- penting
+import '../../application/playlist/update_playlist_usecase.dart';
 
-// Provider
+// provider
 import '../../core/di/providers.dart';
 
 class PlaylistSongsController
@@ -29,7 +28,7 @@ class PlaylistController
   final AddSongToPlaylistUsecase addSongToPlaylist;
   final ListSongsInPlaylistUsecase listSongsInPlaylist;
   final RemoveSongFromPlaylistUsecase removeSongUsecase;
-  final UpdatePlaylistUsecase updatePlaylistUsecase; // <-- penting
+  final UpdatePlaylistUsecase updatePlaylistUsecase;
   final Ref ref;
 
   Map<String, String?> playlistCovers = {};
@@ -40,7 +39,7 @@ class PlaylistController
     required this.addSongToPlaylist,
     required this.listSongsInPlaylist,
     required this.removeSongUsecase,
-    required this.updatePlaylistUsecase, // <-- penting
+    required this.updatePlaylistUsecase,
     required this.ref,
   }) : super(const AsyncValue.loading());
 

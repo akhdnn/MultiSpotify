@@ -22,13 +22,13 @@ class AuthController extends StateNotifier<UserEntity?> {
     state = user;
   }
 
-  // LOGIN → state berubah, router redirect ke '/'
+  // login (state berubah), router redirect ke '/'
   Future<void> login(String email, String password) async {
     final user = await loginUsecase.execute(email, password);
     state = user;
   }
 
-  // REGISTER → TIDAK mengubah state
+  // register (state ga berubah)
   Future<void> register(String email, String password) async {
     await registerUsecase.execute(email, password);
   }

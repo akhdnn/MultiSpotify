@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/di/providers.dart';
-import '../../../domain/entities/song_entity.dart';
 
 class AddSongModal extends ConsumerWidget {
   final String playlistId;

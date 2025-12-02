@@ -24,8 +24,6 @@ class SongRepositoryImpl implements SongRepository {
         .select('*')
         .order('created_at', ascending: false);
 
-    if (response == null || response is! List) return [];
-
     return response
         .map((row) => SongDto.fromJson(row))
         .map(mapDtoToEntity)
@@ -42,8 +40,6 @@ class SongRepositoryImpl implements SongRepository {
           .select('*')
           .or("title.ilike.%$keyword%,artist.ilike.%$keyword%")
           .order('created_at', ascending: false);
-
-      if (response == null || response is! List) return [];
 
       return response
           .map((row) => SongDto.fromJson(row))
@@ -90,8 +86,6 @@ class SongRepositoryImpl implements SongRepository {
         .select('artist')
         .ilike('artist', '%$keyword%')
         .order('artist', ascending: true);
-
-    if (response == null || response is! List) return [];
 
     final artists =
         response.map((row) => row['artist'].toString()).toSet().toList();

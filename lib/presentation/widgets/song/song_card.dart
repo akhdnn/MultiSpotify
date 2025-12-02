@@ -107,6 +107,6 @@ class SongCard extends ConsumerWidget {
   // Memendekkan UID supaya cantik
   String _shortUid(String uid) {
     if (uid.length < 8) return uid;
-    return uid.substring(0, 6) + "...";
+    return "${uid.substring(0, 6)}...";
   }
 }
